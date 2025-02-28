@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  localstack:
+    # image: localstack/localstack:2.0.2
+    image: localstack/localstack:latest
+    container_name: aws_local_service
+    ports:
+      - "4567-4584:4567-4584"
+      - "8055:8080"
+      - "8000:8000"
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,sqs,secretsmanager,s3,lambda,iam,cloudformation,cloudwatch,sts,ec2,ecs,ecr,events,logs,route53,apigateway,stepfunctions,secretsmanager
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - AWS_DEFAULT_REGION=us-east-1
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+    volumes:
+      - ./tmp/localstack:/var/lib/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data_loader.sh:/docker-entrypoint-initaws.d/data_loader.sh
+      # The /docker-entrypoint-initaws.d directory usage has now been deprecated. The Pluggable initialization hooks in /etc/localstack/init/<stage>.d have replaced the legacy Init scripts, and the former will be removed entirely in the 2.0 release.
+      # use below one if with newer localstack version
+      #- './data_loader.sh:/etc/localstack/init/ready.d/init-aws.sh'
+      
+      #- ./localstack/init-secrets-manager.sh:/docker-entrypoint-initaws.d/init-secrets-manager.sh
+
+networks:
+  default:
+    name: demo_network
